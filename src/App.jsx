@@ -53,7 +53,7 @@ function App() {
 
 
 
-      <main className="px-4">
+      <main className="px-6 md:px-10 py-6 bg-gray-50 min-h-screen">
         {page === "matches" ? <Matches /> : <CreateMatch />}
       </main>
     </div>
