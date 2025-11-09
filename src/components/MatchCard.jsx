@@ -42,10 +42,10 @@ export default function MatchCard({ match, refreshMatches }) {
       setStatus("joined");
 
       if (typeof refreshMatches === "function") {
-        await refreshMatches(); // 🟢 теперь ждём обновления списка матчей
+        await refreshMatches();
       }
 
-      await loadPlayers(); // 🟢 сразу обновляем игроков
+      await loadPlayers();
     } catch (err) {
       console.error(err);
       setStatus(err.message);
@@ -84,10 +84,6 @@ export default function MatchCard({ match, refreshMatches }) {
     }
   };
 
-  // Текущее число игроков
-  const currentCount =
-    players.length > 0 ? players.length : (match.players_count ?? 0);
-
   // Удаление матча
   const handleDelete = async () => {
     if (!confirm("Удалить матч?")) return;
@@ -103,32 +99,35 @@ export default function MatchCard({ match, refreshMatches }) {
     }
   };
 
+  // Текущее число игроков
+  const currentCount =
+    match.players_count ?? (players.length > 0 ? players.length : 0);
+
   return (
     <div className="bg-white rounded-2xl shadow p-4 flex flex-col gap-2 transition-all duration-300 hover:shadow-lg">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">{match.field_name}</h2>
-        {isCreator && (
-          <button
-            onClick={handleDelete}
-            className="text-red-500 text-sm hover:underline"
-          >
-            🗑 Удалить
-          </button>
-        )}
-      </div>
+      {/* Заголовок */}
+      <h2 className="text-lg font-semibold">{match.field_name}</h2>
 
+      {/* Основная информация */}
       <p className="text-gray-600 text-sm">📍 {match.address}</p>
+
       <p className="text-gray-600 text-sm">
-        📅{" "}
-        {new Date(match.date_time).toLocaleString("ru-RU", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })}
+        📅 {new Date(match.start_time).toLocaleDateString("ru-RU", { dateStyle: "medium" })}{" "}
+        🕒 {new Date(match.start_time).toLocaleTimeString("ru-RU", { timeStyle: "short" })} – 
+        {new Date(match.end_time).toLocaleTimeString("ru-RU", { timeStyle: "short" })}
       </p>
+
 
       {match.price && <p className="text-gray-700">💸 {match.price} ₽</p>}
 
-      {/* Счётчик игроков */}
+      {/* 💬 Комментарий к матчу */}
+      {match.comment && (
+        <p className="text-gray-700 italic border-t pt-2 mt-2">
+          💬 {match.comment}
+        </p>
+      )}
+
+      {/* 👥 Счётчик игроков */}
       <button
         onClick={() => {
           if (!showPlayers) loadPlayers();
@@ -139,26 +138,28 @@ export default function MatchCard({ match, refreshMatches }) {
         👥 {currentCount} / {match.player_limit} игроков
       </button>
 
+      {/* Список игроков */}
       {showPlayers && (
         <ul className="mt-2 border-t pt-2 text-sm text-gray-700">
           {players.length > 0 ? (
             players.map((p) => (
-              <li key={p.id} className="py-0.5">
-                {p.name}
+              <li key={p.id} className="py-1">
+                <div className="font-medium">{p.name}</div>
                 {isCreator && p.contact && (
-                  <span className="text-gray-500 text-xs ml-2">
-                    {p.contact}
-                  </span>
+                  <div className="text-gray-500 text-xs mt-0.5">
+                    📞 {p.contact}
+                  </div>
                 )}
               </li>
             ))
           ) : (
             <li className="text-gray-400">Пока никого</li>
           )}
+
         </ul>
       )}
 
-      {/* Блок действий */}
+      {/* Кнопки участия */}
       <div className="mt-2 flex flex-col gap-2">
         {status === "joined" ? (
           <>
@@ -189,6 +190,16 @@ export default function MatchCard({ match, refreshMatches }) {
             <p className="text-red-600 text-xs">{status}</p>
           )}
       </div>
+
+      {/* 🗑 Кнопка удаления — внизу карточки */}
+      {isCreator && (
+        <button
+          onClick={handleDelete}
+          className="mt-3 bg-red-600 text-white rounded-lg py-1 text-sm hover:bg-red-700 transition self-start"
+        >
+          🗑 Удалить матч
+        </button>
+      )}
     </div>
   );
 }

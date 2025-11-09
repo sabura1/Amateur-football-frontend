@@ -5,7 +5,8 @@ export default function CreateMatch() {
     field_name: "",
     address: "",
     date: "",
-    time: "",
+    start_time: "",
+    end_time: "",
     max_players: "",
     price: ""
   });
@@ -28,10 +29,12 @@ export default function CreateMatch() {
         body: JSON.stringify({
           field_name: form.field_name,
           address: form.address,
-          date_time: `${form.date}T${form.time}`,
+          start_time: `${form.date}T${form.start_time}`,
+          end_time: `${form.date}T${form.end_time}`,
           player_limit: Number(form.max_players),
           price: form.price ? Number(form.price) : null,
           creator_id: user?.id, // 🆕 передаём организатора
+          comment: form.comment || null,
         }),
       });
 
@@ -42,7 +45,8 @@ export default function CreateMatch() {
         field_name: "",
         address: "",
         date: "",
-        time: "",
+        start_time: "",
+        end_time: "",
         max_players: "",
         price: "",
       });
@@ -88,13 +92,23 @@ export default function CreateMatch() {
         />
 
         <input
-          name="time"
+          name="start_time"
           type="time"
-          value={form.time}
+          value={form.start_time}
           onChange={handleChange}
           required
           className="border rounded p-2"
         />
+
+        <input
+          name="end_time"
+          type="time"
+          value={form.end_time}
+          onChange={handleChange}
+          required
+          className="border rounded p-2"
+        />
+
 
         <input
           name="max_players"
@@ -109,11 +123,20 @@ export default function CreateMatch() {
         <input
           name="price"
           type="number"
-          placeholder="Стоимость участия (₽)"
+          placeholder="Стоимость участия"
           value={form.price}
           onChange={handleChange}
           className="border rounded p-2"
         />
+
+        <input
+          name="comment"
+          placeholder="Комментарий"
+          value={form.comment || ""}
+          onChange={handleChange}
+          className="border rounded p-2"
+        />
+
 
         <button
           type="submit"
